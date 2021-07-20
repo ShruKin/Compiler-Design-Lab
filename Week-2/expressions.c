@@ -41,11 +41,14 @@ char **tokenize(char *exp, int *tokenCount) {
     int i = 0, expSize = strlen(exp);
     while (i < expSize) {
         buffer = NULL;
-        if (isOperator(exp[i])) {
+        if (exp[i] == ' ') {
+            i++;
+            continue;
+        } else if (isOperator(exp[i])) {
             buffer = strcat_c(buffer, exp[i]);
             i++;
         } else {
-            while (!isOperator(exp[i]) && i < expSize) {
+            while (exp[i] != ' ' && !isOperator(exp[i]) && i < expSize) {
                 buffer = strcat_c(buffer, exp[i]);
                 i++;
             }
@@ -65,7 +68,9 @@ char **tokenize(char *exp, int *tokenCount) {
 }
 
 int main(int argc, char const *argv[]) {
-    char *exp = "54+37*22/654-92";
+    // char *exp = "54 + 37 * 22 / 654 - 92";  // infix
+    // char *exp = "54 37 22 * 654 / + 92 -";  // postfix
+    char *exp = "+ 4 - * 37 / 22 654 92";  // prefix
 
     int tokens;
     char **tokenizedExp = tokenize(exp, &tokens);
