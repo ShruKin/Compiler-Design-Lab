@@ -1,0 +1,1 @@
+#include<stdio.h>intmain(intargc,charconst*argv[]){intsum=0;for(inti=0;i<10;i++){sum+=i;}printf("%d",sum);return0;}
