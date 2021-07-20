@@ -3,7 +3,7 @@
 
 int main(int argc, char const *argv[]) {
     FILE *inFp, *outFp;
-    char *line, ch, nextCh, next2Ch;
+    char ch, nextCh, next2Ch;
 
     inFp = fopen("tests\\comm.c", "r");
     outFp = fopen("tests\\comm_no_comments.c", "w");
@@ -19,7 +19,7 @@ int main(int argc, char const *argv[]) {
 
             if (nextCh == '/') {
                 while ((nextCh = fgetc(inFp)) != '\n') {
-                    putchar(nextCh);
+                    continue;
                 }
             }
 
@@ -29,7 +29,7 @@ int main(int argc, char const *argv[]) {
                         (next2Ch = fgetc(inFp)) == '/') {
                         break;
                     }
-                    putchar(nextCh);
+                    continue;
                 }
             }
 
