@@ -67,6 +67,16 @@ char **tokenize(char *exp, int *tokenCount) {
     return tokenizedExp;
 }
 
+char *join(char **exp, int tokens) {
+    char *joined = exp[0];
+    for (int i = 1; i < tokens; i++) {
+        strcat(joined, exp[i]);
+        strcat(joined, " ");
+    }
+
+    return joined;
+}
+
 int main(int argc, char const *argv[]) {
     // char *exp = "54 + 37 * 22 / 654 - 92";  // infix
     // char *exp = "54 37 22 * 654 / + 92 -";  // postfix
@@ -79,6 +89,8 @@ int main(int argc, char const *argv[]) {
     for (int i = 0; i < tokens; i++) {
         printf("%s ", tokenizedExp[i]);
     }
+
+    printf("\nJoined: %s", join(tokenizedExp, tokens));
 
     return 0;
 }
