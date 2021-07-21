@@ -25,6 +25,8 @@ int isOperator(char o) {
         case '/':
         case '%':
         case '^':
+        case '(':
+        case ')':
             return 1;
         default:
             return 0;
@@ -70,6 +72,8 @@ char **tokenize(char *exp, int *tokenCount) {
 
 char *join(char **exp, int tokens) {
     char *joined = exp[0];
+    strcat(joined, " ");
+
     for (int i = 1; i < tokens; i++) {
         strcat(joined, exp[i]);
         strcat(joined, " ");
@@ -78,8 +82,8 @@ char *join(char **exp, int tokens) {
     return joined;
 }
 
-int precedence(char o) {
-    switch (o) {
+int precedence(char *o) {
+    switch (o[0]) {
         case '^':
             return 3;
         case '/':
@@ -94,22 +98,95 @@ int precedence(char o) {
     }
 }
 
-char **infix_to_postfix(char **exp, int tokens) {}
+struct Stack {
+    int top;
+    unsigned int capacity;
+    char **elements;
+};
 
-int main(int argc, char const *argv[]) {
-    char *exp = "54 + 37 * 22 / 654 - 92";  // infix
-    // char *exp = "54 37 22 * 654 / + 92 -";  // postfix
-    // char *exp = "+ 4 - * 37 / 22 654 92";  // prefix
+struct Stack *initStack(unsigned int size) {
+    struct Stack *stack = (struct Stack *)malloc(sizeof(struct Stack));
 
-    int tokens;
-    char **tokenizedExp = tokenize(exp, &tokens);
-
-    printf("No. of tokens: %d\n", tokens);
-    for (int i = 0; i < tokens; i++) {
-        printf("%s ", tokenizedExp[i]);
+    if (!stack) {
+        return NULL;
     }
 
-    printf("\nJoined: %s", join(tokenizedExp, tokens));
+    stack->top = -1;
+    stack->capacity = size;
+
+    stack->elements = malloc(stack->capacity * sizeof(char *));
+
+    return stack;
+}
+
+int isEmpty(struct Stack *stack) { return stack->top == -1; }
+
+char *peek(struct Stack *stack) { return stack->elements[stack->top]; }
+
+char *pop(struct Stack *stack) {
+    if (!isEmpty(stack)) {
+        return stack->elements[stack->top--];
+    }
+    return NULL;
+}
+
+void push(struct Stack *stack, char *op) { stack->elements[++stack->top] = op; }
+
+char **infix_to_postfix(char **infix, int tokens) {
+    char **postfix = malloc(tokens * sizeof(char *));
+    struct Stack *stack = initStack(tokens);
+    int k = 0;
+
+    for (int i = 0; i < tokens; i++) {
+        if (!isOperator_s(infix[i])) {
+            postfix[k++] = infix[i];
+        }
+
+        else if (infix[i] == "(") {
+            push(stack, infix[i]);
+        }
+
+        else if (infix[i] == ")") {
+            while (!isEmpty(stack) && peek(stack) != "(") {
+                postfix[k++] = pop(stack);
+            }
+
+            if (!isEmpty(stack) && peek(stack) != "(") {
+                return NULL;
+            } else {
+                pop(stack);
+            }
+        }
+
+        else {
+            while (!isEmpty(stack) &&
+                   precedence(infix[i]) <= precedence(peek(stack))) {
+                postfix[k++] = pop(stack);
+            }
+            push(stack, infix[i]);
+        }
+    }
+
+    while (!isEmpty(stack)) {
+        postfix[k++] = pop(stack);
+    }
+
+    return postfix;
+}
+
+int main(int argc, char const *argv[]) {
+    // char *exp = "54 + 37 * 22 / 654 - 92";  // infix
+    // // char *exp = "54 37 22 * 654 / + 92 -";  // postfix
+    // // char *exp = "+ 4 - * 37 / 22 654 92";  // prefix
+
+    char *infixExp = "54 + 37 * 22 / 654 - 92";
+    int tokens;
+    char **tokenizedInfixExp = tokenize(infixExp, &tokens);
+
+    char **tokenizedPostfixExp = infix_to_postfix(tokenizedInfixExp, tokens);
+    char *postfixExp = join(tokenizedPostfixExp, tokens);
+
+    printf("\nPostfix: %s", postfixExp);
 
     return 0;
 }
