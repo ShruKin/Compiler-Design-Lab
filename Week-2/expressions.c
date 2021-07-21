@@ -24,6 +24,7 @@ int isOperator(char o) {
         case '*':
         case '/':
         case '%':
+        case '^':
             return 1;
         default:
             return 0;
@@ -77,10 +78,28 @@ char *join(char **exp, int tokens) {
     return joined;
 }
 
+int precedence(char o) {
+    switch (o) {
+        case '^':
+            return 3;
+        case '/':
+        case '*':
+        case '%':
+            return 2;
+        case '+':
+        case '-':
+            return 1;
+        default:
+            return -1;
+    }
+}
+
+char **infix_to_postfix(char **exp, int tokens) {}
+
 int main(int argc, char const *argv[]) {
-    // char *exp = "54 + 37 * 22 / 654 - 92";  // infix
+    char *exp = "54 + 37 * 22 / 654 - 92";  // infix
     // char *exp = "54 37 22 * 654 / + 92 -";  // postfix
-    char *exp = "+ 4 - * 37 / 22 654 92";  // prefix
+    // char *exp = "+ 4 - * 37 / 22 654 92";  // prefix
 
     int tokens;
     char **tokenizedExp = tokenize(exp, &tokens);
