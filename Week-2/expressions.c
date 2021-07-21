@@ -132,21 +132,24 @@ char *pop(struct Stack *stack) {
 
 void push(struct Stack *stack, char *op) { stack->elements[++stack->top] = op; }
 
-char **infix_to_postfix(char **infix, int tokens) {
+char *infix_to_postfix(char *infix) {
+    int tokens;
+    char **tokenizedInfixExp = tokenize(infix, &tokens);
+
     char **postfix = malloc(tokens * sizeof(char *));
     struct Stack *stack = initStack(tokens);
     int k = 0;
 
     for (int i = 0; i < tokens; i++) {
-        if (!isOperator_s(infix[i])) {
-            postfix[k++] = infix[i];
+        if (!isOperator_s(tokenizedInfixExp[i])) {
+            postfix[k++] = tokenizedInfixExp[i];
         }
 
-        else if (infix[i] == "(") {
-            push(stack, infix[i]);
+        else if (tokenizedInfixExp[i] == "(") {
+            push(stack, tokenizedInfixExp[i]);
         }
 
-        else if (infix[i] == ")") {
+        else if (tokenizedInfixExp[i] == ")") {
             while (!isEmpty(stack) && peek(stack) != "(") {
                 postfix[k++] = pop(stack);
             }
@@ -159,11 +162,11 @@ char **infix_to_postfix(char **infix, int tokens) {
         }
 
         else {
-            while (!isEmpty(stack) &&
-                   precedence(infix[i]) <= precedence(peek(stack))) {
+            while (!isEmpty(stack) && precedence(tokenizedInfixExp[i]) <=
+                                          precedence(peek(stack))) {
                 postfix[k++] = pop(stack);
             }
-            push(stack, infix[i]);
+            push(stack, tokenizedInfixExp[i]);
         }
     }
 
@@ -171,22 +174,63 @@ char **infix_to_postfix(char **infix, int tokens) {
         postfix[k++] = pop(stack);
     }
 
-    return postfix;
+    return join(postfix, tokens);
+}
+
+char *infix_to_prefix(char *infix) {
+    int tokens;
+    char **tokenizedInfixExp = tokenize(infix, &tokens);
+
+    char **prefix = malloc(tokens * sizeof(char *));
+    struct Stack *stack = initStack(tokens);
+    int k = tokens - 1;
+
+    for (int i = tokens - 1; i >= 0; i--) {
+        if (!isOperator_s(tokenizedInfixExp[i])) {
+            prefix[k--] = tokenizedInfixExp[i];
+        }
+
+        else if (tokenizedInfixExp[i] == ")") {
+            push(stack, tokenizedInfixExp[i]);
+        }
+
+        else if (tokenizedInfixExp[i] == "(") {
+            while (!isEmpty(stack) && peek(stack) != ")") {
+                prefix[k--] = pop(stack);
+            }
+
+            if (!isEmpty(stack) && peek(stack) != ")") {
+                return NULL;
+            } else {
+                pop(stack);
+            }
+        }
+
+        else {
+            while (!isEmpty(stack) && precedence(tokenizedInfixExp[i]) <=
+                                          precedence(peek(stack))) {
+                prefix[k--] = pop(stack);
+            }
+            push(stack, tokenizedInfixExp[i]);
+        }
+    }
+
+    while (!isEmpty(stack)) {
+        prefix[k--] = pop(stack);
+    }
+
+    return join(prefix, tokens);
 }
 
 int main(int argc, char const *argv[]) {
     // char *exp = "54 + 37 * 22 / 654 - 92";  // infix
-    // // char *exp = "54 37 22 * 654 / + 92 -";  // postfix
-    // // char *exp = "+ 4 - * 37 / 22 654 92";  // prefix
+    // char *exp = "54 37 22 * 654 / + 92 -";  // postfix
+    // char *exp = "+ 54 - * 37 / 22 654 92";  // prefix
 
     char *infixExp = "54 + 37 * 22 / 654 - 92";
-    int tokens;
-    char **tokenizedInfixExp = tokenize(infixExp, &tokens);
 
-    char **tokenizedPostfixExp = infix_to_postfix(tokenizedInfixExp, tokens);
-    char *postfixExp = join(tokenizedPostfixExp, tokens);
-
-    printf("\nPostfix: %s", postfixExp);
+    printf("\nPostfix: %s", infix_to_postfix(infixExp));
+    printf("\nPostfix: %s", infix_to_prefix(infixExp));
 
     return 0;
 }
