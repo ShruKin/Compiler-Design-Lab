@@ -352,18 +352,21 @@ int main(int argc, char const *argv[]) {
     // char *exp = "+ 54 - * 37 / 22 654 92";  // prefix
 
     char *infixExp = "54 + 37 * 22 / 654 - 92";
+    printf("Infix [INPUT]: %s\n", infixExp);
     printf("Postfix: %s\n", infix_to_postfix(infixExp));
     printf("Prefix: %s\n", infix_to_prefix(infixExp));
 
     printf("\n");
 
     char *postfixExp = "54 37 22 * 654 / + 92 -";
+    printf("Postfix [INPUT]: %s\n", postfixExp);
     printf("Infix: %s\n", postfix_to_infix(postfixExp));
     printf("Prefix: %s\n", postfix_to_prefix(postfixExp));
 
     printf("\n");
 
     char *prefixExp = "+ 54 - * 37 / 22 654 92";
+    printf("Prefix [INPUT]: %s\n", prefixExp);
     printf("Infix: %s\n", prefix_to_infix(prefixExp));
     printf("Postfix: %s\n", prefix_to_postfix(prefixExp));
 

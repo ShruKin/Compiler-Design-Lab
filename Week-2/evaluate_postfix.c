@@ -148,6 +148,7 @@ int evaluate_postfix(char *postfix) {
 
 int main(int argc, char const *argv[]) {
     char *postfixExp = "54 37 22 * 654 / + 92 -";
+    printf("Postfix [INPUT]: %s\n", postfixExp);
     printf("Evaluated: %d\n", evaluate_postfix(postfixExp));
 
     return 0;
