@@ -282,9 +282,35 @@ char *postfix_to_prefix(char *postfix) {
         }
     }
 
-    // while (!isEmpty(stack)) {
-    //     printf("%s\n", pop(stack));
-    // }
+    return peek(stack);
+}
+
+char *prefix_to_infix(char *prefix) {
+    int tokens;
+    char **tokenizedPrefixExp = tokenize(prefix, &tokens);
+
+    struct Stack *stack = initStack(2 * tokens);
+
+    char *operand1 = malloc(MAX_OPERATION_SIZE * sizeof(char)),
+         *operand2 = malloc(MAX_OPERATION_SIZE * sizeof(char)),
+         *operation = malloc(MAX_OPERATION_SIZE * sizeof(char));
+
+    for (int i = tokens - 1; i >= 0; i--) {
+        if (!isOperator_s(tokenizedPrefixExp[i])) {
+            push(stack, tokenizedPrefixExp[i]);
+        } else {
+            strcpy(operand1, pop(stack));
+            strcpy(operand2, pop(stack));
+
+            strcpy(operation, "(");
+            strcat(operation, operand1);
+            strcat(operation, tokenizedPrefixExp[i]);
+            strcat(operation, operand2);
+            strcat(operation, ")");
+
+            push(stack, operation);
+        }
+    }
 
     return peek(stack);
 }
@@ -295,14 +321,19 @@ int main(int argc, char const *argv[]) {
     // char *exp = "+ 54 - * 37 / 22 654 92";  // prefix
 
     char *infixExp = "54 + 37 * 22 / 654 - 92";
-    printf("\nPostfix: %s", infix_to_postfix(infixExp));
-    printf("\nPrefix: %s", infix_to_prefix(infixExp));
+    printf("Postfix: %s\n", infix_to_postfix(infixExp));
+    printf("Prefix: %s\n", infix_to_prefix(infixExp));
 
     printf("\n");
 
     char *postfixExp = "54 37 22 * 654 / + 92 -";
-    printf("\nInfix: %s", postfix_to_infix(postfixExp));
-    printf("\nPrefix: %s", postfix_to_prefix(postfixExp));
+    printf("Infix: %s\n", postfix_to_infix(postfixExp));
+    printf("Prefix: %s\n", postfix_to_prefix(postfixExp));
+
+    printf("\n");
+
+    char *prefixExp = "+ 54 - * 37 / 22 654 92";
+    printf("Infix: %s\n", prefix_to_infix(prefixExp));
 
     return 0;
 }
