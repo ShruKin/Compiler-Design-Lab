@@ -315,6 +315,37 @@ char *prefix_to_infix(char *prefix) {
     return peek(stack);
 }
 
+char *prefix_to_postfix(char *prefix) {
+    int tokens;
+    char **tokenizedPrefixExp = tokenize(prefix, &tokens);
+
+    struct Stack *stack = initStack(2 * tokens);
+
+    char *operand1 = malloc(MAX_OPERATION_SIZE * sizeof(char)),
+         *operand2 = malloc(MAX_OPERATION_SIZE * sizeof(char)),
+         *operation = malloc(MAX_OPERATION_SIZE * sizeof(char));
+
+    for (int i = tokens - 1; i >= 0; i--) {
+        if (!isOperator_s(tokenizedPrefixExp[i])) {
+            push(stack, tokenizedPrefixExp[i]);
+        } else {
+            strcpy(operand1, pop(stack));
+            strcpy(operand2, pop(stack));
+
+            strcpy(operation, operand1);
+            strcat(operation, " ");
+            strcat(operation, operand2);
+            strcat(operation, " ");
+            strcat(operation, tokenizedPrefixExp[i]);
+            strcat(operation, " ");
+
+            push(stack, operation);
+        }
+    }
+
+    return peek(stack);
+}
+
 int main(int argc, char const *argv[]) {
     // char *exp = "54 + 37 * 22 / 654 - 92";  // infix
     // char *exp = "54 37 22 * 654 / + 92 -";  // postfix
@@ -334,6 +365,7 @@ int main(int argc, char const *argv[]) {
 
     char *prefixExp = "+ 54 - * 37 / 22 654 92";
     printf("Infix: %s\n", prefix_to_infix(prefixExp));
+    printf("Postfix: %s\n", prefix_to_postfix(prefixExp));
 
     return 0;
 }
